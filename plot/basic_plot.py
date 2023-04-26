@@ -8,11 +8,14 @@ y = [2, 4, 6, 8, 10]
 plt.plot(x, y)
 
 # Set labels for x-axis and y-axis
-plt.set_xlabel('X-axis Label')
-plt.set_ylabel('Y-axis Label')
+plt.xlabel('X-axis Label')
+plt.ylabel('Y-axis Label')
 
 # Set title for the plot
-plt.set_title('Line Graph Example')
+plt.title('Line Graph Example')
 
-# Display the plot
-plt.show()
+## Display the plot
+#plt.show()
+
+#Save plot
+plt.savefig('basic.png')
