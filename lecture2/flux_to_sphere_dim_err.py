@@ -2,7 +2,7 @@
 ####
 #### 1D Simulation: Implicit
 #### Flux to a Sphere
-#### 
+#### Dimensionless
 #### 
 ####
 #############################
@@ -16,33 +16,14 @@ plt.close()                         # close any open plots
 
 start = datetime.now()              # store the current time
 
-#######################
-#### Physical Constants
-#######################
-F = 96485                           # Faraday Constant (C/mol)
-R = 8.314                           # Gas Constant (J K-1 mol-1)
-T = 298                             # Temperature
-
-############################
-#### Experimental parameters
-############################
-duration = 10 
-D = 1e-9                            # Diffusion Coefficient (m2 s-1)
-radius = 1e-6                       # Electrode radius (m)
-conc = 1                            # Concentration of analyte (mol m-3)
-
-
 #Space grid
 h0 = 0.001                           # Smallest grid step
-
-#Initial time and time step
-delta_time = 1e-2
 
 ####
 ## Dimensionless variables
 ####
-deltaT = D*delta_time/radius**2     # Dimensionless initial time step
-maxT = D*duration/radius**2         # Duration of the experiment in dimensionless time
+deltaT = 10
+maxT = 10000
 maxR = 1+6*np.sqrt(maxT)            # Maximum distance away from the electrode
 k = int(maxT/deltaT)
 
@@ -107,30 +88,20 @@ tau.pop(0)
 #Having completed the simulation record the time
 finish = datetime.now()
 
-def dimFluxtoFlux(flux):                        # define a helper function to convert the calculated flux back into dimensional current
-    temp = []
-    for i in range(len(flux)):
-        temp.append(flux[i]*(D*conc/radius))
-    return temp
-
-flux = dimFluxtoFlux(flux)
-time = [(t*radius**2)/D for t in tau]
-
 # calculate the analytically predicted flux- this is done using list comprehension
-ext_cottrell = [radius**2/(np.pi*D*t) for t in time]          
-ext_cottrell = [1+ec**0.5 for ec in ext_cottrell]
-ext_cottrell = [-D*conc*ec/radius for ec in ext_cottrell]
+dim_cottrell = [1/(np.pi*t) for t in tau]          
+dim_cottrell = [-1-ec**0.5 for ec in dim_cottrell]
 
 ######
 ## Plotting
 #####
 # plot the current (flux)
-plt.loglog(time,[-1*f for f in flux], color = 'r', label = 'Sim')     # [y*1e6 for y in flux] - this is list comprehension to muliply each value in a list by 1x10^6
-plt.loglog(time,[-1*ec for ec in ext_cottrell], color = 'k', label='Analytical')     # [y*1e6 for y in flux] - this is list comprehension to muliply each value in a list by 1x10^6
-plt.xlabel('Time / s')            # add x-axis label
-plt.ylabel('Flux/ mol m$^{-2}$ s$^{-1}$')
+plt.loglog(tau,[-1*f for f in flux], color = 'r', label = 'Sim')     # [y*1e6 for y in flux] - this is list comprehension to muliply each value in a list by 1x10^6
+plt.loglog(tau,[-1*ec for ec in dim_cottrell], color = 'k', label='Analytical')     # [y*1e6 for y in flux] - this is list comprehension to muliply each value in a list by 1x10^6
+plt.xlabel('Time')            # add x-axis label
+plt.ylabel('Flux')
 plt.legend()
-plt.savefig('flux_to_sphere.png')
+plt.savefig('flux_to_sphere_dim_err.png')
 #plt.show() 
 
 print(finish-start)     # simulation completion time
